@@ -1,7 +1,7 @@
 import os
 from extract_text import extract_txt
-from extract_md_from_llm import save_extracted_data_as_markdown  # Extract financial tables
-from relabelled_md import relabel_balance_sheet  # Relabel extracted Markdown tables
+from extract_md_from_llm import save_extracted_data_as_markdown 
+from relabelled_md import relabel_balance_sheet  
 
 INPUT_DIR = r"C:\Users\Shubhangi Mishra\Desktop\Financial_extraction\PDF directory"
 OUTPUT_TEXT_DIR = r"C:\Users\Shubhangi Mishra\Desktop\Financial_extraction\processed_text"

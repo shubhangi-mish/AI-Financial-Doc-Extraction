@@ -22,12 +22,22 @@ def extract_financial_tables_markdown(text):
     If any table is missing, **mention that explicitly**.
 
     **Output format (Markdown tables only, no extra text):**
-     
+    
+    # Balance Sheet  
     | Category  | Value |
     |-----------|-------|
     | Revenue   | $XXX  |
     | Expenses  | $XXX  |
 
+    # Income Statement  
+    | Category  | Amount |
+    |-----------|--------|
+    | Net Profit | $XXX  |
+
+    # Cash Flow Statement  
+    | Category  | Amount |
+    |-----------|--------|
+    | Operating Cash Flow | $XXX  |
 
     **Strictly return Markdown output only.**
     
