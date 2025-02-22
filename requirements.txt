@@ -4,4 +4,7 @@ fitz
 pytesseract
 python-dotenv
 paddlepaddle
-paddgleocr
+paddleocr
+docx2txt
+PyPDF2
+striprtf

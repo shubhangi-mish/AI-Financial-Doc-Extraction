@@ -1,6 +1,9 @@
 import os
 import google.generativeai as genai
 from dotenv import load_dotenv
+import docx2txt
+import PyPDF2
+from striprtf.striprtf import rtf_to_text  # New: Extract text from RTF without Pandoc
 
 # Load API key
 load_dotenv()
@@ -9,10 +12,21 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # Configure Gemini API
 genai.configure(api_key=GEMINI_API_KEY)
 
-def load_vocabulary(vocab_path):
-    """Reads the vocabulary list from a text file."""
-    with open(vocab_path, "r", encoding="utf-8") as f:
-        return f.read()
+def extract_text_from_file(file_path):
+    """Extracts text from RTF, DOCX, or PDF files."""
+    _, ext = os.path.splitext(file_path)
+
+    if ext.lower() == ".rtf":
+        with open(file_path, "r", encoding="utf-8") as f:
+            return rtf_to_text(f.read())  # Convert RTF to plain text
+    elif ext.lower() == ".docx":
+        return docx2txt.process(file_path)  # Extract text from DOCX
+    elif ext.lower() == ".pdf":
+        with open(file_path, "rb") as f:
+            reader = PyPDF2.PdfReader(f)
+            return "\n".join(page.extract_text() for page in reader.pages if page.extract_text())
+    else:
+        raise ValueError(f"Unsupported file format: {ext}")
 
 def relabel_balance_sheet(markdown_path, vocab_path, output_dir):
     """
@@ -26,31 +40,38 @@ def relabel_balance_sheet(markdown_path, vocab_path, output_dir):
     with open(markdown_path, "r", encoding="utf-8") as f:
         markdown_content = f.read()
 
-    # Load vocabulary list
-    vocab_terms = load_vocabulary(vocab_path)
+    # Extract text from vocabulary file
+    vocab_terms = extract_text_from_file(vocab_path)
 
     # LLM Prompt
     prompt = f"""
-    You are an AI that relabels financial Balance Sheet line items using a given vocabulary.
+    You are an AI that relabels items in this markdown using a given vocabulary.
     
     Task:
-    - Re-label the extracted Balance Sheet table line items by mapping them to the closest corresponding terms in the provided vocabulary list.
+    - Re-label the extracted items by mapping them to the closest corresponding terms in the provided vocabulary list.
     - Maintain the original structure and values of the table.
     - Only update the labels.
 
     Vocabulary List:
     {vocab_terms}
 
-    Original Balance Sheet (in Markdown format):
+    Original Data (in Markdown format):
     {markdown_content}
 
     Provide the updated table in Markdown format without any explanation.
     """
 
     try:
-        # Send to LLM
-        model = genai.GenerativeModel("gemini-1.5-pro")
-        response = model.generate_content(prompt)
+        # Initialize model properly and clear cache
+        model = genai.GenerativeModel("gemini-1.5-pro")  # Ensure model is defined
+        del model  # Remove any cached instance
+        model = genai.GenerativeModel("gemini-1.5-pro")  # Fresh instance
+
+        # Generate response from LLM
+        response = model.generate_content(
+            prompt,
+            generation_config={"temperature": 1.0, "top_p": 0.9, "max_output_tokens": 1024}
+        )
 
         # Extract modified Markdown table
         modified_markdown = response.text
@@ -71,8 +92,8 @@ def relabel_balance_sheet(markdown_path, vocab_path, output_dir):
 
 # Example Usage
 if __name__ == "__main__":
-    MARKDOWN_FILE = r"C:\Users\Shubhangi Mishra\Desktop\Financial_extraction\extracted_markdown\balance_sheet.md"
-    VOCAB_FILE = r"C:\Users\Shubhangi Mishra\Desktop\Financial_extraction\vocabulary.txt"
+    MARKDOWN_FILE = r"C:\Users\Shubhangi Mishra\Desktop\Financial_extraction\extracted_tables_markdown\vodafone_annual_report_reduced.md"
+    VOCAB_FILE = r"C:\Users\Shubhangi Mishra\Desktop\Financial_extraction\vocabulary of allowed terms.rtf"  # Can be RTF, DOCX, or PDF
     OUTPUT_DIR = r"C:\Users\Shubhangi Mishra\Desktop\Financial_extraction\relabelled_markdown"
 
     relabel_balance_sheet(MARKDOWN_FILE, VOCAB_FILE, OUTPUT_DIR)
