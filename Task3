@@ -1,0 +1,20 @@
+Things I would do if I had more time:
+
+1. User expansion of vocabulary list.
+->The user could add more items and words in the vocabulary list according to their requirements.
+
+2. Parallel processing of multiple files:
+-> If there are more files then we can process them parallely
+
+3. Confidence scoring and resoning for relabelled items.
+-> Confidence scoring could suggest how confident the LLM is when it changed the label name and what was the reason to change it, then it would implement COT (chain of thoughts) and it would not change anything unnessearily.
+
+4. Normalise financial figures.
+-> Eg. 1000,1K would mean the same thing but it causes inconsistency in the information, so normalization could be done to improve visualization of data.
+
+5. Use Vector Database for similar financial reports .
+-> If we need to find similar financial reports then we can use vector database.
+-> we can AUTO CATEGORIZE documents on the basis of this.
+
+6. QnA based chatting with the financial document.
+-> we can do this with Assistant API.
