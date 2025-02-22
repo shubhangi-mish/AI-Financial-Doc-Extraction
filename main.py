@@ -1,29 +1,19 @@
 import os
-from extract_text import extract_text_from_pdf
+from extract_text import extract_txt
 
-# Define input/output directories
+# Directories
 INPUT_DIR = r"C:\Users\Shubhangi Mishra\Desktop\Financial_extraction\PDF directory"
-TXT_DIR = r"C:\Users\Shubhangi Mishra\Desktop\Financial_extraction\Text directory"
+OUTPUT_DIR = r"C:\Users\Shubhangi Mishra\Desktop\Financial_extraction\processed_text"
 
 # Ensure output directory exists
-os.makedirs(TXT_DIR, exist_ok=True)
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-def process_pdfs():
-    """Reads PDFs from INPUT_DIR, extracts text, and saves to OUTPUT_DIR."""
+def process_files():
+    """Processes all PDFs and DOCX files in INPUT_DIR."""
     for filename in os.listdir(INPUT_DIR):
-        if filename.endswith(".pdf"):
+        if filename.endswith((".pdf", ".docx")):
             input_path = os.path.join(INPUT_DIR, filename)
-            output_filename = os.path.splitext(filename)[0] + ".txt"
-            output_path = os.path.join(TXT_DIR, output_filename)
-
-            # Extract text from PDF
-            text = extract_text_from_pdf(input_path)
-
-            # Save text to file
-            with open(output_path, "w", encoding="utf-8") as f:
-                f.write(text)
-            
-            print(f"✅ Processed: {filename} → {output_filename}")
+            extract_txt(input_path, OUTPUT_DIR)
 
 if __name__ == "__main__":
-    process_pdfs()
+    process_files()

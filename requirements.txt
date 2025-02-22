@@ -1,0 +1,7 @@
+python-docx
+pdfplubmer
+fitz
+pytesseract
+python-dotenv
+paddlepaddle
+paddgleocr
