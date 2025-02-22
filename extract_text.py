@@ -1,12 +1,11 @@
 import os
 import docx
 import pdfplumber
-import fitz  # PyMuPDF
+import fitz 
 import numpy as np
 from pdf2image import convert_from_path
 from paddleocr import PaddleOCR
 
-# Initialize PaddleOCR (faster than EasyOCR)
 ocr = PaddleOCR(use_angle_cls=True, lang='en')
 
 def pdf_to_text(file_path):
@@ -39,14 +38,14 @@ def ocr_pdf_to_text(file_path):
     """Extract text from image-based PDFs using PaddleOCR."""
     extracted_text = ""
     try:
-        pages = convert_from_path(file_path, 300)  # Convert PDF pages to images
+        pages = convert_from_path(file_path, 300)  
         for page in pages:
             page_np = np.array(page)
-            result = ocr.ocr(page_np, cls=True)  # Perform OCR with PaddleOCR
+            result = ocr.ocr(page_np, cls=True) 
             
             for line in result:
                 for word_info in line:
-                    extracted_text += word_info[1][0] + " "  # Extract text
+                    extracted_text += word_info[1][0] + " " 
     except Exception as e:
         print(f"⚠️ Error performing OCR on PDF file '{file_path}': {e}")
     return extracted_text
@@ -79,7 +78,7 @@ def extract_txt(file_path, output_txt_dir):
             text = fallback_pdf_to_text(file_path)
         if not text.strip():
             print("ℹ️ No text extracted with PyMuPDF, using PaddleOCR...")
-            text = ocr_pdf_to_text(file_path)  # OCR Fallback with PaddleOCR
+            text = ocr_pdf_to_text(file_path)  
     elif ext == '.docx':
         text = read_docx(file_path)
     else:
@@ -90,11 +89,10 @@ def extract_txt(file_path, output_txt_dir):
         print(f"⚠️ No text extracted from {file_path}")
         return None
 
-    # Save extracted text
     base_filename = os.path.splitext(os.path.basename(file_path))[0]
     output_txt_path = os.path.join(output_txt_dir, f"{base_filename}.txt")
     save_text_to_file(text, output_txt_path)
     print(f"✅ Saved: {output_txt_path}")
 
-    return output_txt_path  # Return the path of the saved text file
+    return output_txt_path 
 
